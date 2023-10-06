@@ -24,7 +24,6 @@ const App = () => {
         console.log("Error loading fonts", error);
       }
     }
-
     loadFonts();
   }, []);
 
