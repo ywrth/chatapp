@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   ImageBackground,
+  KeyboardAvoidingView,
 } from "react-native";
 import * as Font from "expo-font"; // Import this if you are using Expo
 
@@ -33,51 +34,63 @@ const Start = ({ navigation }) => {
   }
 
   return (
-    <ImageBackground
-      source={require("../assets/Background.png")}
-      style={styles.backgroundImage}
-    >
-      <View style={styles.container}>
-        <Text style={styles.title}>Welcome to GossipGrove!</Text>
+    <View style={{ flex: 1 }}>
+      <ImageBackground
+        source={require("../assets/Background.png")}
+        style={styles.backgroundImage}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.container}
+        >
+          <View style={styles.container}>
+            <Text style={styles.title}>Welcome to GossipGrove!</Text>
 
-        <View style={styles.contentBox}>
-          <TextInput
-            style={styles.textInput}
-            value={name}
-            onChangeText={setName}
-            placeholder="Your name..."
-            placeholderTextColor="rgba(117, 112, 131, 0.5)"
-          />
-          <Text style={styles.chooseColorText}>Choose background color:</Text>
-          <View style={styles.colorContainer}>
-            {["#090C08", "#474056", "#8A95A5", "#B9C6AE"].map(
-              (color, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[
-                    styles.colorChoice,
-                    { backgroundColor: color },
-                    selectedColor === color && styles.selectedColor,
-                  ]}
-                  onPress={() => setSelectedColor(color)}
-                />
-              )
-            )}
+            <View style={styles.contentBox}>
+              <TextInput
+                style={styles.textInput}
+                value={name}
+                onChangeText={setName}
+                placeholder="Your name..."
+                placeholderTextColor="rgba(117, 112, 131, 0.5)"
+              />
+              <Text style={styles.chooseColorText}>
+                Choose background color:
+              </Text>
+              <View style={styles.colorContainer}>
+                {["#090C08", "#474056", "#8A95A5", "#B9C6AE"].map(
+                  (color, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={[
+                        styles.colorChoice,
+                        { backgroundColor: color },
+                        selectedColor === color && styles.selectedColor,
+                      ]}
+                      onPress={() => setSelectedColor(color)}
+                    />
+                  )
+                )}
+              </View>
+              <TouchableOpacity
+                style={styles.startButton}
+                onPress={() =>
+                  navigation.navigate("Chat", {
+                    name: name,
+                    backgroundColor: selectedColor,
+                  })
+                }
+              >
+                <Text style={styles.buttonText}>Start Chatting</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <TouchableOpacity
-            style={styles.startButton}
-            onPress={() =>
-              navigation.navigate("Chat", {
-                name: name,
-                backgroundColor: selectedColor,
-              })
-            }
-          >
-            <Text style={styles.buttonText}>Start Chatting</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ImageBackground>
+        </KeyboardAvoidingView>
+      </ImageBackground>
+      {Platform.OS === "ios" ? (
+        <KeyboardAvoidingView behavior="padding" />
+      ) : null}
+    </View>
   );
 };
 

@@ -29,39 +29,17 @@ const Chat = ({ route, navigation }) => {
   }, []);
 
   useEffect(() => {
-    navigation.setOptions({
-      title: name,
-    });
-
-    async function loadFont() {
-      await Font.loadAsync({
-        "Poppins-Regular": require("/Users/ywrth/Documents/PROJECTS/chatdemo/assets/Poppins/Poppins-Regular.ttf"),
-      });
-      setFontLoaded(true);
-    }
-
-    loadFont();
+    navigation.setOptions({ title: name });
   }, []);
 
-  if (!fontLoaded) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
   return (
-    <View style={[styles.container, { backgroundColor: backgroundColor }]}>
-      <Text style={styles.text}>Welcome, {name}!</Text>
-      <GiftedChat
-        messages={messages}
-        onSend={(newMessages) => onSend(newMessages)}
-        user={{
-          _id: 1,
-        }}
-      />
-    </View>
+    <GiftedChat
+      messages={messages}
+      onSend={(messages) => onSend(messages)}
+      user={{
+        _id: 1,
+      }}
+    />
   );
 };
 
