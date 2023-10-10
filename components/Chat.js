@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { GiftedChat } from "react-native-gifted-chat"; // importing gifted chat
-import { StyleSheet, View, Text } from "react-native";
-import * as Font from "expo-font"; // Import this if you are using Expo
+import { Bubble, GiftedChat } from "react-native-gifted-chat"; // importing gifted chat
+import {
+  StyleSheet,
+  View,
+  Text,
+  Keyboard,
+  KeyboardAvoidingView,
+} from "react-native";
+import * as Font from "expo-font";
 
 const Chat = ({ route, navigation }) => {
   const { name, backgroundColor } = route.params;
@@ -25,6 +31,12 @@ const Chat = ({ route, navigation }) => {
           avatar: "https://placeimg.com/140/140/any",
         },
       },
+      {
+        _id: 2,
+        text: "YOU JOINED THE CHAT",
+        createdAt: new Date(),
+        system: true,
+      },
     ]);
   }, []);
 
@@ -33,11 +45,30 @@ const Chat = ({ route, navigation }) => {
   }, []);
 
   return (
-    <GiftedChat
-      messages={messages}
-      onSend={(messages) => onSend(messages)}
-      user={{
-        _id: 1,
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: backgroundColor }}>
+      <GiftedChat
+        messages={messages}
+        renderBubble={renderBubble}
+        onSend={(messages) => onSend(messages)}
+        user={{
+          _id: 1,
+        }}
+      />
+    </KeyboardAvoidingView>
+  );
+};
+
+const renderBubble = (props) => {
+  return (
+    <Bubble
+      {...props}
+      wrapperStyle={{
+        right: {
+          backgroundColor: "#06B",
+        },
+        left: {
+          backgroundColor: "#FFF",
+        },
       }}
     />
   );

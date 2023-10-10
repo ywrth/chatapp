@@ -39,10 +39,7 @@ const Start = ({ navigation }) => {
         source={require("../assets/Background.png")}
         style={styles.backgroundImage}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={styles.container}
-        >
+        <KeyboardAvoidingView style={{ flex: 1 }}>
           <View style={styles.container}>
             <Text style={styles.title}>Welcome to GossipGrove!</Text>
 
@@ -57,7 +54,7 @@ const Start = ({ navigation }) => {
               <Text style={styles.chooseColorText}>
                 Choose background color:
               </Text>
-              <View style={styles.colorContainer}>
+              <View style={styles.colorsContainer}>
                 {["#090C08", "#474056", "#8A95A5", "#B9C6AE"].map(
                   (color, index) => (
                     <TouchableOpacity
