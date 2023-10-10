@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import Start from "./components/Start";
 import Chat from "./components/Chat";
 import * as Font from "expo-font";
-
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StyleSheet, View, Text } from "react-native";
