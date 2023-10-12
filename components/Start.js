@@ -7,13 +7,17 @@ import {
   TouchableOpacity,
   ImageBackground,
   KeyboardAvoidingView,
+  Alert,
 } from "react-native";
 import * as Font from "expo-font"; // Import this if you are using Expo
+import { getAuth, signInAnonymously } from "firebase/auth";
 
 const Start = ({ navigation }) => {
   const [name, setName] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [fontLoaded, setFontLoaded] = useState(false);
+
+  const auth = getAuth();
 
   useEffect(() => {
     async function loadFont() {
@@ -24,6 +28,25 @@ const Start = ({ navigation }) => {
     }
     loadFont();
   }, []);
+
+  const signInUser = () => {
+    if (!name) {
+      Alert.alert("Name is required!");
+      return;
+    }
+    signInAnonymously(auth)
+      .then((result) => {
+        navigation.navigate("Chat", {
+          name: name,
+          userID: result.user.uid,
+          backgroundColor: selectedColor,
+        });
+        Alert.alert("You have successfully signed in!");
+      })
+      .catch((error) => {
+        Alert.alert("There was an error signing in.");
+      });
+  };
 
   if (!fontLoaded) {
     return (
@@ -69,15 +92,7 @@ const Start = ({ navigation }) => {
                   )
                 )}
               </View>
-              <TouchableOpacity
-                style={styles.startButton}
-                onPress={() =>
-                  navigation.navigate("Chat", {
-                    name: name,
-                    backgroundColor: selectedColor,
-                  })
-                }
-              >
+              <TouchableOpacity style={styles.startButton} onPress={signInUser}>
                 <Text style={styles.buttonText}>Start Chatting</Text>
               </TouchableOpacity>
             </View>

@@ -1,48 +1,55 @@
 import React, { useEffect, useState } from "react";
 import { Bubble, GiftedChat } from "react-native-gifted-chat"; // importing gifted chat
-import {
-  StyleSheet,
-  View,
-  Text,
-  Keyboard,
-  KeyboardAvoidingView,
-} from "react-native";
+import { StyleSheet, KeyboardAvoidingView } from "react-native";
 import * as Font from "expo-font";
+import {
+  addDoc,
+  collection,
+  query,
+  onSnapshot,
+  orderBy,
+} from "firebase/firestore";
 
-const Chat = ({ route, navigation }) => {
-  const { name, backgroundColor } = route.params;
-  const [fontLoaded, setFontLoaded] = useState(false);
+const Chat = ({ route, navigation, db }) => {
+  const { name, backgroundColor, userID } = route.params;
+  console.log(route.params);
   const [messages, setMessages] = useState([]);
-  const onSend = (newMessages) => {
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, newMessages)
+
+  useEffect(() => {
+    const messagesQuery = query(
+      collection(db, "messages"),
+      orderBy("createdAt", "desc")
     );
+
+    const unsubscribe = onSnapshot(messagesQuery, (Snapshot) => {
+      const fetchedMessages = Snapshot.docs.map((doc) => {
+        const data = doc.data();
+        const createdAt = new Date(data.createdAt.seconds * 1000);
+        return {
+          ...data,
+          createdAt,
+        };
+      });
+      setMessages(fetchedMessages);
+    });
+
+    return () => unsubscribe();
+  }, [db]);
+
+  const onSend = (newMessages = []) => {
+    const messageToSave = {
+      ...newMessages[0],
+      user: {
+        _id: userID,
+        name: name,
+      },
+    };
+    addDoc(collection(db, "messages"), messageToSave);
   };
 
   useEffect(() => {
-    setMessages([
-      {
-        _id: 1,
-        text: "Hello developer",
-        createdAt: new Date(),
-        user: {
-          _id: 2,
-          name: "React Native",
-          avatar: "https://placeimg.com/140/140/any",
-        },
-      },
-      {
-        _id: 2,
-        text: "YOU JOINED THE CHAT",
-        createdAt: new Date(),
-        system: true,
-      },
-    ]);
-  }, []);
-
-  useEffect(() => {
     navigation.setOptions({ title: name });
-  }, []);
+  }, [name, navigation]);
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: backgroundColor }}>
@@ -51,7 +58,8 @@ const Chat = ({ route, navigation }) => {
         renderBubble={renderBubble}
         onSend={(messages) => onSend(messages)}
         user={{
-          _id: 1,
+          _id: userID,
+          name: name,
         }}
       />
     </KeyboardAvoidingView>
