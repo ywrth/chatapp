@@ -1,34 +1,37 @@
-import React, { useState, useEffect } from "react";
-import Start from "./components/Start";
 import Chat from "./components/Chat";
-import * as Font from "expo-font";
+import Start from "./components/Start";
+
+// import react Navigation
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { StyleSheet, View, Text } from "react-native";
 
+//import Firestore
+import { initializeApp } from "firebase/app";
+import {
+  getFirestore,
+  disableNetwork,
+  enableNetwork,
+} from "firebase/firestore";
+
+import { useNetInfo } from "@react-native-community/netinfo";
+import { useEffect } from "react";
+import { Alert } from "react-native";
+import { getStorage } from "firebase/storage";
+
+// Create the navigator
 const Stack = createNativeStackNavigator();
 
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-
 const App = () => {
-  const [fontLoaded, setFontLoaded] = useState(false);
+  const connectionStatus = useNetInfo();
 
   useEffect(() => {
-    async function loadFonts() {
-      try {
-        await Font.loadAsync({
-          "Poppins-Regular": require("/Users/ywrth/Documents/PROJECTS/chatdemo/assets/Poppins/Poppins-Regular.ttf"),
-
-          // Add other font variants if needed
-        });
-        setFontLoaded(true);
-      } catch (error) {
-        console.log("Error loading fonts", error);
-      }
+    if (connectionStatus.isConnected === false) {
+      Alert.alert("Connection Lost!");
+      disableNetwork(db);
+    } else if (connectionStatus.isConnected === true) {
+      enableNetwork(db);
     }
-    loadFonts();
-  }, []);
+  }, [connectionStatus.isConnected]);
 
   const firebaseConfig = {
     apiKey: "AIzaSyBiKks1xBaPvbIHOc-fuWiVDY_uU2aeecE",
@@ -41,37 +44,29 @@ const App = () => {
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
+
+  // Initialize Cloud Firestore and get a reference to the service
   const db = getFirestore(app);
 
-  if (!fontLoaded) {
-    return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
+  const storage = getStorage(app);
 
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Start">
-        <Stack.Screen name="Start" component={Start} />
+        <Stack.Screen name="Welcome" component={Start} />
         <Stack.Screen name="Chat">
-          {(props) => <Chat {...props} db={db} />}
+          {(props) => (
+            <Chat
+              isConnected={connectionStatus.isConnected}
+              db={db}
+              storage={storage}
+              {...props}
+            />
+          )}
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  text: {
-    fontFamily: "Poppins-Regular",
-  },
-});
 
 export default App;

@@ -1,192 +1,202 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   StyleSheet,
   View,
   Text,
+  Button,
   TextInput,
-  TouchableOpacity,
   ImageBackground,
+  ScrollView,
+  TouchableOpacity,
+  Platform,
   KeyboardAvoidingView,
   Alert,
 } from "react-native";
-import * as Font from "expo-font"; // Import this if you are using Expo
 import { getAuth, signInAnonymously } from "firebase/auth";
 
 const Start = ({ navigation }) => {
-  const [name, setName] = useState("");
-  const [selectedColor, setSelectedColor] = useState("");
-  const [fontLoaded, setFontLoaded] = useState(false);
-
   const auth = getAuth();
-
-  useEffect(() => {
-    async function loadFont() {
-      await Font.loadAsync({
-        "Poppins-Regular": require("/Users/ywrth/Documents/PROJECTS/chatdemo/assets/Poppins/Poppins-Regular.ttf"),
-      });
-      setFontLoaded(true);
-    }
-    loadFont();
-  }, []);
+  const backgroundImage = require("../assets/Background.png");
 
   const signInUser = () => {
-    if (!name) {
-      Alert.alert("Name is required!");
-      return;
-    }
+    // Sign in anonymously using Firebase
     signInAnonymously(auth)
       .then((result) => {
+        // Navigate to the Chat screen with user information
         navigation.navigate("Chat", {
-          name: name,
           userID: result.user.uid,
-          backgroundColor: selectedColor,
+          name: name,
+          color: color,
         });
-        Alert.alert("You have successfully signed in!");
+        Alert.alert("Signed in Successfully!");
       })
       .catch((error) => {
-        Alert.alert("There was an error signing in.");
+        Alert.alert("Unable to sign in, try again later.", error);
       });
   };
 
-  if (!fontLoaded) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
+  const backgroundColors = {
+    a: "#090C08",
+    b: "#474056",
+    c: "#8A95A5",
+    d: "#B9C6AE",
+  };
+
+  const [name, setName] = useState("");
+  const [color, setColor] = useState(backgroundColors.a);
 
   return (
-    <View style={{ flex: 1 }}>
-      <ImageBackground
-        source={require("../assets/Background.png")}
-        style={styles.backgroundImage}
+    <ImageBackground
+      source={backgroundImage}
+      resizeMode="cover"
+      style={styles.bgImage}
+    >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : null}
+        style={styles.container}
       >
-        <KeyboardAvoidingView style={{ flex: 1 }}>
-          <View style={styles.container}>
-            <Text style={styles.title}>Welcome to GossipGrove!</Text>
-
-            <View style={styles.contentBox}>
-              <TextInput
-                style={styles.textInput}
-                value={name}
-                onChangeText={setName}
-                placeholder="Your name..."
-                placeholderTextColor="rgba(117, 112, 131, 0.5)"
-              />
-              <Text style={styles.chooseColorText}>
-                Choose background color:
-              </Text>
-              <View style={styles.colorsContainer}>
-                {["#090C08", "#474056", "#8A95A5", "#B9C6AE"].map(
-                  (color, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      style={[
-                        styles.colorChoice,
-                        { backgroundColor: color },
-                        selectedColor === color && styles.selectedColor,
-                      ]}
-                      onPress={() => setSelectedColor(color)}
-                    />
-                  )
-                )}
-              </View>
-              <TouchableOpacity style={styles.startButton} onPress={signInUser}>
-                <Text style={styles.buttonText}>Start Chatting</Text>
-              </TouchableOpacity>
-            </View>
+        <Text style={styles.chatTitle}>ChatApp</Text>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.textInput}
+            value={name}
+            onChangeText={setName}
+            placeholder="Your Name"
+            accessible={true}
+            accessibilityLabel="Name inputbox"
+            accessibilityHint="Enter your name here"
+            accessibilityRole="text"
+          />
+          <Text style={styles.colorSelectorTitle}>
+            Choose a background color:
+          </Text>
+          <View
+            style={styles.bgColorWrapper}
+            accessible={true}
+            accessibilityLabel="Background color selection"
+            accessibilityRole="menu"
+          >
+            <TouchableOpacity
+              style={[
+                styles.colorCircle,
+                color === backgroundColors.a && styles.activeColorCircle,
+                { backgroundColor: backgroundColors.a },
+              ]}
+              onPress={() => setColor(backgroundColors.a)}
+              accessible={true}
+              accessibilityLabel="Color - black"
+              accessibilityRole="menuitem"
+            ></TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.colorCircle,
+                color === backgroundColors.b && styles.activeColorCircle,
+                { backgroundColor: backgroundColors.b },
+              ]}
+              onPress={() => setColor(backgroundColors.b)}
+              accessible={true}
+              accessibilityLabel="Color - dark gray/blue"
+              accessibilityRole="menuitem"
+            ></TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.colorCircle,
+                color === backgroundColors.c && styles.activeColorCircle,
+                { backgroundColor: backgroundColors.c },
+              ]}
+              onPress={() => setColor(backgroundColors.c)}
+              accessible={true}
+              accessibilityLabel="Color - light gray/blue"
+              accessibilityRole="menuitem"
+            ></TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.colorCircle,
+                color === backgroundColors.d && styles.activeColorCircle,
+                { backgroundColor: backgroundColors.d },
+              ]}
+              onPress={() => setColor(backgroundColors.d)}
+              accessible={true}
+              accessibilityLabel="Color - light gray/green"
+              accessibilityRole="menuitem"
+            ></TouchableOpacity>
           </View>
-        </KeyboardAvoidingView>
-      </ImageBackground>
-      {Platform.OS === "ios" ? (
-        <KeyboardAvoidingView behavior="padding" />
-      ) : null}
-    </View>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={signInUser}
+            accessible={true}
+            accessibilityLabel="Get chatting Button"
+            accessibilityHint="Navigates to the chat screen."
+            accessibilityRole="button"
+          >
+            <Text style={styles.buttonText}>Get chatting!</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "space-evenly",
+    justifyContent: "center",
     alignItems: "center",
+  },
+  bgImage: {
+    flex: 1,
+    justifyContent: "space-between",
+    padding: "6%",
+  },
+  chatTitle: {
+    fontSize: 45,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    alignSelf: "center",
+  },
+  inputContainer: {
+    backgroundColor: "#FFFFFF",
+    padding: "6%",
+    paddingBottom: 20,
   },
   textInput: {
-    width: "88%",
+    fontSize: 16,
+    fontWeight: "300",
+    color: "#757083",
     padding: 15,
     borderWidth: 1,
+    borderColor: "#757083",
     marginTop: 15,
     marginBottom: 15,
-    fontFamily: "Poppins-Regular",
   },
-  backgroundImage: {
-    flex: 1,
-    resizeMode: "cover",
-    alignItems: "center",
-    justifyContent: "center",
+  colorSelectorTitle: {
+    fontSize: 16,
+    fontWeight: "300",
+    color: "#8A95A5",
+    marginBottom: 10,
   },
-  colorsContainer: {
+  bgColorWrapper: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 20,
   },
   colorCircle: {
-    width: 50,
     height: 50,
-    borderRadius: 25,
-    marginHorizontal: 10,
-  },
-  title: {
-    fontSize: 45,
-    fontWeight: "600",
-    color: "#FFFFFF",
-    fontFamily: "Poppins-Regular", // added this here if you want the title to use the font
-  },
-  chooseColorText: {
-    fontSize: 16,
-    fontWeight: "300",
-    color: "#757083",
-  },
-  colorChoice: {
     width: 50,
-    height: 50,
     borderRadius: 25,
-    margin: 10,
   },
-  selectedColor: {
+  activeColorCircle: {
     borderWidth: 2,
-    borderColor: "#FFFFFF",
+    borderColor: "#FCE205",
   },
-  startButton: {
-    backgroundColor: "#757083",
-    padding: 15,
-    borderRadius: 10,
-    width: "60%",
-    alignItems: "center",
+  button: {
+    backgroundColor: "#000",
+    padding: 10,
   },
   buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#FFFFFF",
-  },
-  contentBox: {
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    width: "88%",
-    padding: 20,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 4,
-  },
-  text: {
-    fontFamily: "Poppins-Regular",
+    color: "#FFF",
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 
