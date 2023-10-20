@@ -1,3 +1,4 @@
+// Import necessary libraries and components.
 import { useState } from "react";
 import {
   StyleSheet,
@@ -15,14 +16,15 @@ import {
 import { getAuth, signInAnonymously } from "firebase/auth";
 
 const Start = ({ navigation }) => {
+  // Initialize Firebase authentication.
   const auth = getAuth();
+  // Background image for the Start screen.
   const backgroundImage = require("../assets/Background.png");
 
+  // Function to sign in user anonymously.
   const signInUser = () => {
-    // Sign in anonymously using Firebase
     signInAnonymously(auth)
       .then((result) => {
-        // Navigate to the Chat screen with user information
         navigation.navigate("Chat", {
           userID: result.user.uid,
           name: name,
@@ -35,6 +37,7 @@ const Start = ({ navigation }) => {
       });
   };
 
+  // Pre-defined background colors for the chat screen.
   const backgroundColors = {
     a: "#090C08",
     b: "#474056",
@@ -42,9 +45,11 @@ const Start = ({ navigation }) => {
     d: "#B9C6AE",
   };
 
+  // Local states for user's name and chosen background color.
   const [name, setName] = useState("");
   const [color, setColor] = useState(backgroundColors.a);
 
+  // Component rendering starts here.
   return (
     <ImageBackground
       source={backgroundImage}
@@ -76,50 +81,22 @@ const Start = ({ navigation }) => {
             accessibilityLabel="Background color selection"
             accessibilityRole="menu"
           >
-            <TouchableOpacity
-              style={[
-                styles.colorCircle,
-                color === backgroundColors.a && styles.activeColorCircle,
-                { backgroundColor: backgroundColors.a },
-              ]}
-              onPress={() => setColor(backgroundColors.a)}
-              accessible={true}
-              accessibilityLabel="Color - black"
-              accessibilityRole="menuitem"
-            ></TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.colorCircle,
-                color === backgroundColors.b && styles.activeColorCircle,
-                { backgroundColor: backgroundColors.b },
-              ]}
-              onPress={() => setColor(backgroundColors.b)}
-              accessible={true}
-              accessibilityLabel="Color - dark gray/blue"
-              accessibilityRole="menuitem"
-            ></TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.colorCircle,
-                color === backgroundColors.c && styles.activeColorCircle,
-                { backgroundColor: backgroundColors.c },
-              ]}
-              onPress={() => setColor(backgroundColors.c)}
-              accessible={true}
-              accessibilityLabel="Color - light gray/blue"
-              accessibilityRole="menuitem"
-            ></TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.colorCircle,
-                color === backgroundColors.d && styles.activeColorCircle,
-                { backgroundColor: backgroundColors.d },
-              ]}
-              onPress={() => setColor(backgroundColors.d)}
-              accessible={true}
-              accessibilityLabel="Color - light gray/green"
-              accessibilityRole="menuitem"
-            ></TouchableOpacity>
+            {/* Color selectors for background colors. */}
+            {/* Each button allows the user to select one of the pre-defined colors. */}
+            {Object.keys(backgroundColors).map((key) => (
+              <TouchableOpacity
+                key={key}
+                style={[
+                  styles.colorCircle,
+                  color === backgroundColors[key] && styles.activeColorCircle,
+                  { backgroundColor: backgroundColors[key] },
+                ]}
+                onPress={() => setColor(backgroundColors[key])}
+                accessible={true}
+                accessibilityLabel={`Color - ${backgroundColors[key]}`}
+                accessibilityRole="menuitem"
+              ></TouchableOpacity>
+            ))}
           </View>
           <TouchableOpacity
             style={styles.button}
@@ -136,6 +113,8 @@ const Start = ({ navigation }) => {
     </ImageBackground>
   );
 };
+
+// Styling for the Start component.
 
 const styles = StyleSheet.create({
   container: {

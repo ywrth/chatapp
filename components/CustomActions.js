@@ -1,3 +1,4 @@
+// Importing necessary libraries and components.
 import { TouchableOpacity, View, Text, StyleSheet, Alert } from "react-native";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 
@@ -5,6 +6,7 @@ import * as Location from "expo-location";
 import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
+// CustomActions component for additional message sending options.
 const CustomActions = ({
   wrapperStyle,
   iconTextStyle,
@@ -12,8 +14,12 @@ const CustomActions = ({
   storage,
   userID,
 }) => {
+  // Initialize action sheet for the component.
   const actionSheet = useActionSheet();
+
+  // Method executed when the user triggers the action sheet.
   const onActionPress = () => {
+    // Define options for the action sheet.
     const options = [
       "Choose From Library",
       "Take Picture",
@@ -22,6 +28,7 @@ const CustomActions = ({
     ];
     const cancelButtonIndex = options.length - 1;
 
+    // Function to get and send current location.
     const getLocation = async () => {
       let permissions = await Location.requestForegroundPermissionsAsync();
       if (permissions?.granted) {
@@ -37,6 +44,7 @@ const CustomActions = ({
       } else Alert.alert("Permissions haven't been granted.");
     };
 
+    // Function to upload image to Firebase and then send its URL.
     const uploadAndSendImage = async (imageURI) => {
       const uniqueRefString = generateReference(imageURI);
       const newUploadRef = ref(storage, uniqueRefString);
@@ -48,6 +56,7 @@ const CustomActions = ({
       });
     };
 
+    // Function to pick an image from the library.
     const pickImage = async () => {
       let permissions = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (permissions?.granted) {
@@ -57,6 +66,7 @@ const CustomActions = ({
       }
     };
 
+    // Function to take a photo using the camera.
     const takePhoto = async () => {
       let permissions = await ImagePicker.requestCameraPermissionsAsync();
       if (permissions?.granted) {
@@ -66,12 +76,14 @@ const CustomActions = ({
       }
     };
 
+    // Function to generate a unique Firebase reference for the image.
     const generateReference = (uri) => {
       const timeStamp = new Date().getTime();
       const imageName = uri.split("/")[uri.split("/").length - 1];
       return `${userID}-${timeStamp}-${imageName}`;
     };
 
+    // Display the action sheet and handle the selected option.
     actionSheet.showActionSheetWithOptions(
       {
         options,
@@ -93,6 +105,7 @@ const CustomActions = ({
     );
   };
 
+  // Return the "+" button that triggers the action sheet.
   return (
     <TouchableOpacity
       style={styles.container}
@@ -108,6 +121,7 @@ const CustomActions = ({
   );
 };
 
+// Styling for the CustomActions component.
 const styles = StyleSheet.create({
   container: {
     width: 26,
